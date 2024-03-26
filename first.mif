@@ -1,0 +1,47 @@
+#MIF 2.1
+Specify Oxs_MultiAtlas:atlas {
+	atlas {Oxs_BoxAtlas:left {
+		xrange {0 100e-9}
+		yrange {0 100e-9}
+		zrange {0 25e-9}
+	}}
+	atlas {Oxs_BoxAtlas:right {
+		xrange {100e-9 200e-9}
+		yrange {0 100e-9}
+		zrange {0 25e-9}
+	}}
+}
+
+set xycell 5e-9
+set zcell 12.5e-9
+
+Specify Oxs_RectangularMesh:mesh [subst {
+	cellsize {$xycell $xycell $zcell}
+	atlas :atlas
+}]
+
+Specify Oxs_UniformExchange {
+	A 12e-12
+	}
+Specify Oxs_Demag {}
+Specify Oxs_UniaxialAnisotropy {
+	K1 {Oxs_AtlasScalarField { 
+		atlas :atlas
+		values {
+			left 5e4
+			right -5e4
+	}}}
+	axis {0 1 0}
+}
+
+Specify Oxs_CGEvolve:evolve {}
+Specify Oxs_MinDriver {
+	 evolver :evolve
+	 mesh :mesh
+	 Ms 8e5
+	 m0 {Oxs_RandomVectorField {
+		min_norm 1
+		max_norm 1
+	}}
+	stopping_mxHxm 1e-3
+}
